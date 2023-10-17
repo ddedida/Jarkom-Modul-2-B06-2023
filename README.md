@@ -206,15 +206,14 @@ Kemudian, karena terdapat beberapa web yang harus di-deploy, buatlah subdomain `
 Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
 
 **Penyelesaian:**
-
-- File `/etc/bind/named.conf.local` node Yudhistira ditambahkan:
+  - File `/etc/bind/named.conf.local` node Yudhistira ditambahkan:
     ```
     zone "3.181.192.in-addr.arpa" {
       type master;
       file "/etc/bind/abimanyu/3.181.192.in-addr.arpa";
     };
     ```
-
+    
   - Konfigurasi file `3.181.192.in-addr.arpa`: <br>
   
     ![config](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/c2d3c5bb-ca1b-4da1-9fb0-4c02494a9275)
@@ -227,16 +226,76 @@ Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
 Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
 
 **Penyelesaian:**
+  - File `/etc/bind/named.conf.local` node Yudhistira pada zone `abimanyu` ditambahkan:
+    ```
+    zone "abimanyu.b06.com" {
+        type master;
+        notify yes;
+        also-notify { 192.181.3.2; };
+        allow-transfer { 192.181.3.2; };
+        file "/etc/bind/abimanyu/abimanyu.b06.com";
+    };
+    ```
+  
+  - File `/etc/bind/named.conf.local` node Werkudara ditambahkan:
+    ```
+    zone "abimanyu.b06.com" {
+    	type slave;
+    	masters { 192.181.2.2; };
+    	file "/var/lib/bind/abimanyu.b06.com";
+    };
+    ```
 
+  - Testing dengan `service bind9 stop` pada node Yudhisitira dan `service bind9 restart` pada node Werkudara, lalu ping di node client: <br>
+
+  ![abimanyu](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/e63add25-eddb-4967-bf7c-44a6e93883ba)
+    
 ## Nomor 7
 Seperti yang kita tahu karena banyak sekali informasi yang harus diterima, buatlah subdomain khusus untuk perang yaitu `baratayuda.abimanyu.yyy.com` dengan alias `www.baratayuda.abimanyu.yyy.com` yang didelegasikan dari Yudhistira ke Werkudara dengan IP menuju ke Abimanyu dalam folder Baratayuda.
 
 **Penyelesaian:**
+  - File `abimanyu.b06.com` node Yudhistira: <br>
+
+    ![configyudhis](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/a29a57fe-81cc-4cdc-862f-e8bd7e561c02)
+
+  - File `/etc/bind/named.conf.options` pada node Yudhistira: <br>
+
+    ![configoptionyudhis](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/a2764a4c-c9f9-4293-a576-31241cd560f9)
+
+  - File `/etc/bind/named.conf.local` node Yudhistira pada zone `abimanyu` ditambahkan:
+    ```
+    zone "abimanyu.b06.com" {
+        type master;
+        notify yes;
+        also-notify { 192.181.3.2; };
+        allow-transfer { 192.181.3.2; };
+        file "/etc/bind/abimanyu/abimanyu.b06.com";
+    };
+    ```
+  
+  - File `/etc/bind/named.conf.options` pada node Werkudara: <br>
+
+    ![configoptionyudhis](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/a2764a4c-c9f9-4293-a576-31241cd560f9)
+
+  - Konfigurasi file `baratayuda.abimanyu.b06.com` node Werkudara: <br>
+  
+    ![werkudaraconfig](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/690dd44c-c9f5-4f22-be15-c2f0b1263a42)
+
+  - Lakukan `service bind9 restart` pada node Werkudara dan lakukan `ping` pada node client, berikut adalah hasilnya: <br>
+
+    ![baratayuda](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/eec2ce07-4258-4e75-bcfd-e62961553498)
 
 ## Nomor 8
 Untuk informasi yang lebih spesifik mengenai Ranjapan Baratayuda, buatlah subdomain melalui Werkudara dengan akses `rjp.baratayuda.abimanyu.yyy.com` dengan alias `www.rjp.baratayuda.abimanyu.yyy.com` yang mengarah ke Abimanyu.
 
 **Penyelesaian:**
+  - Konfigurasi file `baratayuda.abimanyu.b06.com` node Werkudara: <br>
+  
+    ![config](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/e2c3d92a-7089-471b-a9e6-59bbaa34f707)
+
+  - Lakukan `service bind9 restart` pada node Werkudara dan lakukan `ping` pada node client, berikut adalah hasilnya: <br>
+
+    ![rjp](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/10919319-7c16-4aa7-9f7c-407c78ed36e6)
 
 ## Nomor 9
 Arjuna merupakan suatu Load Balancer Nginx dengan tiga worker (yang juga menggunakan nginx sebagai webserver) yaitu Prabakusuma, Abimanyu, dan Wisanggeni. Lakukan deployment pada masing-masing worker.
