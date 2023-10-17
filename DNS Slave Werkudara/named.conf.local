@@ -1,0 +1,23 @@
+zone "arjuna.b06.com" {
+    type slave;
+    masters { 192.181.1.2; };
+    file "/var/lib/bind/arjuna.b06.com";
+};
+
+zone "abimanyu.b06.com" {
+    type slave;
+    masters { 192.181.1.2; };
+    file "/var/lib/bind/abimanyu.b06.com";
+};
+
+zone "baratayuda.abimanyu.b06.com" {
+    type master;
+    #masters { 192.181.1.2; };
+    file "/etc/bind/delegasi/baratayuda.abimanyu.b06.com";
+};
+
+zone "3.181.192.in-addr.arpa" {
+    type slave;
+    masters { 192.181.3.4; };
+    file "/var/lib/bind/4.181.192.in-addr.arpa";
+};

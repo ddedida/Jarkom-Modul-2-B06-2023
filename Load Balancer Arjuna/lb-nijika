@@ -1,0 +1,15 @@
+# Default menggunakan Round Robin
+upstream myweb  {
+        server 192.181.3.4:8002; #IP Abimanyu
+        server 192.181.3.5:8003; #IP Wisanggeni
+        server 192.181.3.6:8001; #IP Prabukusuma
+}
+
+server {
+        listen 80;
+        server_name arjuna.b06.com www.arjuna.b06.com;
+
+        location / {
+        proxy_pass http://myweb;
+        }
+}
