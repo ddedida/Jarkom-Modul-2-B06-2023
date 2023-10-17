@@ -1,5 +1,4 @@
 # Praktikum Modul 2 Jaringan Komputer
-<div align=justify>
 
 Berikut merupakan Laporan Resmi dari Praktikum Modul 2 Jaringan Komputer kelompok B06.
 
@@ -16,25 +15,213 @@ Yudhistira akan digunakan sebagai DNS Master, Werkudara sebagai DNS Slave, Arjun
 
 **Penyelesaian:**
 
+- Berikut merupakan topologi yang dikerjakan:
+  <br>
+
+  ![Topologi](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/d39894ce-cf21-4337-a9b4-473ce438faf6)
+
+- Berikut adalah network configuration pada setiap node:
+  - Router Pandudewanata
+    <br>
+  
+    ```
+    auto eth0
+    iface eth0 inet dhcp
+  
+    auto eth1
+      iface eth1 inet static
+	    address 192.181.1.1
+	    netmask 255.255.255.0
+
+    auto eth2
+      iface eth2 inet static
+	    address 192.181.2.1
+	    netmask 255.255.255.0
+
+    auto eth3
+      iface eth3 inet static
+	    address 192.181.3.1
+	    netmask 255.255.255.0
+    ```
+
+  - Yudhistira DNS Master
+    <br>
+
+    ```
+    auto eth0
+      iface eth0 inet static
+	    address 192.181.2.2
+	    netmask 255.255.255.0
+	    gateway 192.181.2.1
+    ```
+
+  - Sadewa Client
+    <br>
+
+    ```
+    auto eth0
+      iface eth0 inet static
+	    address 192.181.1.2
+	    netmask 255.255.255.0
+	    gateway 192.181.1.1
+    ```
+
+  - Nakula Client
+    <br>
+
+    ```
+    auto eth0
+      iface eth0 inet static
+	    address 192.181.1.3
+	    netmask 255.255.255.0
+	    gateway 192.181.1.1
+    ```
+
+  - Werkudara DNS Slave
+    <br>
+
+    ```
+    auto eth0
+      iface eth0 inet static
+	    address 192.181.3.2
+	    netmask 255.255.255.0
+	    gateway 192.181.3.1
+    ```
+
+  - Arjuna Load Balancer
+    <br>
+
+    ```
+    auto eth0
+      iface eth0 inet static
+	    address 192.181.3.3
+	    netmask 255.255.255.0
+	    gateway 192.181.3.1
+    ```
+
+  - Abimanyu Web Server
+    <br>
+
+    ```
+    auto eth0
+      iface eth0 inet static
+	    address 192.181.3.4
+	    netmask 255.255.255.0
+	    gateway 192.181.3.1
+    ```
+
+  - Prabakusuma Web Server
+    <br>
+
+    ```
+    auto eth0
+      iface eth0 inet static
+	    address 192.181.3.5
+	    netmask 255.255.255.0
+	    gateway 192.181.3.1
+    ```
+
+  - Wisanggeni Web Server
+    <br>
+
+    ```
+    auto eth0
+      iface eth0 inet static
+	    address 192.181.3.6
+	    netmask 255.255.255.0
+	    gateway 192.181.3.1
+    ```
+
+  Selanjutnya, pada terminal `Router Pandudewanata` diketikan script:
+  ```
+  iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.181.0.0/16
+  ```
+  Kemudian pada terminal setiap node yang telah dikonfigurasi networknya, dilakukan script:
+  ```
+  echo nameserver 192.168.122.1 > /etc/resolv.conf
+  ```
+  Setelah itu setiap node bisa melakukan ping ke `google.com`, berikut merupakan hasil dari node `Sadewa Client` dan `Nakula Client`:
+  - Sadewa
+    <br>
+    
+    ![Topologi_Sadewa](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/2063b8af-5ce1-459f-a67c-336bf37fb0b2)
+  - Nakula
+    <br>
+    
+    ![Topologi_Nakula](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/fe2c778f-58df-40d3-a2a7-9fcecac6588f)
+
 ## Nomor 2
 Buatlah website utama pada node arjuna dengan akses ke `arjuna.yyy.com` dengan alias `www.arjuna.yyy.com` dengan `yyy` merupakan kode kelompok.
 
 **Penyelesaian:**
+  - File `/etc/bind/named.conf.local` node Yudhistira ditambahkan:
+    ```
+    zone "arjuna.b06.com" {
+        type master;
+        file "/etc/bind/arjuna/arjuna.b06.com";
+    };
+    ```
+
+  - Konfigurasi file `arjuna.b06.com` node Yudhistira: <br>
+  
+    ![config](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/268e703c-5c1e-40af-a5f0-7cd698534991)
+
+  - Lakukan `service bind9 restart` pada node Yudhistira dan lakukan `ping` pada node client, berikut adalah hasilnya: <br>
+
+    ![arjuna](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/ad67eac0-c38e-4882-abd7-2e97771d341b)
 
 ## Nomor 3
 Dengan cara yang sama seperti soal nomor 2, buatlah website utama dengan akses ke `abimanyu.yyy.com` dan alias `www.abimanyu.yyy.com`.
 
 **Penyelesaian:**
+  - File `/etc/bind/named.conf.local` node Yudhistira ditambahkan:
+    ```
+    zone "abimanyu.b06.com" {
+        type master;
+        file "/etc/bind/abimanyu/abimanyu.b06.com";
+    };
+    ```
+
+  - Konfigurasi file `abimanyu.b06.com` node Yudhistira: <br>
+  
+    ![config](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/e177faf4-4b5d-48d1-924c-24af8f7373c5)
+
+  - Lakukan `service bind9 restart` pada node Yudhistira dan lakukan `ping` pada node client, berikut adalah hasilnya: <br>
+
+    ![abimanyu](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/086bd526-8097-4394-9aab-64d371cbb412)
 
 ## Nomor 4
 Kemudian, karena terdapat beberapa web yang harus di-deploy, buatlah subdomain `parikesit.abimanyu.yyy.com` yang diatur DNS-nya di Yudhistira dan mengarah ke Abimanyu.
 
 **Penyelesaian:**
+  - File `abimanyu.b06.com` node Yudhistira: <br>
+
+    ![config](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/0ef2bbc2-2f87-41ac-96c7-2a55f107c66d)
+
+  - Lakukan `service bind9 restart` pada node Yudhistira dan lakukan `ping` pada node client, berikut adalah hasilnya: <br>
+
+    ![parikesit](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/255fe011-856d-4b72-9e1d-bac5dce0f4e4)
 
 ## Nomor 5
 Buat juga reverse domain untuk domain utama. (Abimanyu saja yang direverse)
 
 **Penyelesaian:**
+
+- File `/etc/bind/named.conf.local` node Yudhistira ditambahkan:
+    ```
+    zone "3.181.192.in-addr.arpa" {
+      type master;
+      file "/etc/bind/abimanyu/3.181.192.in-addr.arpa";
+    };
+    ```
+
+  - Konfigurasi file `3.181.192.in-addr.arpa`: <br>
+  
+    ![config](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/c2d3c5bb-ca1b-4da1-9fb0-4c02494a9275)
+
+  - Lakukan `service bind9 restart` pada node Yudhistira dan lakukan `host -t PTR 192.181.3.4` pada node client, berikut adalah hasilnya: <br>
+
+    ![parikesit](https://github.com/ddedida/Jarkom-Modul-2-B06-2023/assets/108203648/3b5c9630-932d-4017-80a5-ec1f3b29a87b)
 
 ## Nomor 6
 Agar dapat tetap dihubungi ketika DNS Server Yudhistira bermasalah, buat juga Werkudara sebagai DNS Slave untuk domain utama.
